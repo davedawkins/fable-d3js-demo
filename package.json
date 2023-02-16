@@ -1,15 +1,12 @@
 {
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server"
+    "start": "dotnet fable watch src --run webpack serve"
   },
   "dependencies": {
-    "@babel/core": "^7.3.4",
     "d3": "^5.9.2",
-    "fable-compiler": "^2.1.12",
-    "fable-loader": "^2.1.5",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.2.1"
+    "webpack": "^5.11.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }

@@ -38,3 +38,4 @@ dumps/
 Scripts/dumps/
 
 ETL/Server/Config/\.keep
+src/*.fs.js
