@@ -10,11 +10,14 @@ let d3 = D3.d3
 // It's used just to make sure basic d3.js is working
 
 d3.selectAll("rect")
+    .transition()
+    .delay(400.)
+    .duration(400.)
     .style("fill", "orange")
     |> ignore
 
-[<Emit("this")>]
-let unsafeJsThis : string = jsNative
+[<Emit("function () { $0(this); }")>]
+let inline thisFunc (f: (obj->unit)) = jsNative
 
 // This code is ported from:
 // http://christopheviau.com/d3_tutorial/
@@ -38,13 +41,13 @@ sampleSVG.append("circle")
         .attr("r", 40)
         .attr("cx", 50)
         .attr("cy", 50)
-        .on("mouseover", fun () ->
-            d3.select(unsafeJsThis) // Hack to mack the compiler happy, preferrable to find another way to do it
+        .on("mouseover", thisFunc <| fun self ->
+            d3.select(self) // Hack to mack the compiler happy, preferrable to find another way to do it
                 .style("fill", "aliceblue")
             |> ignore
         )
-        .on("mouseout", fun () ->
-            d3.select(unsafeJsThis) // Hack to mack the compiler happy, preferrable to find another way to do it
+        .on("mouseout", thisFunc <| fun self ->
+            d3.select(self) // Hack to mack the compiler happy, preferrable to find another way to do it
                 .style("fill", "white")
             |> ignore
         )
@@ -60,8 +63,8 @@ let animationSVG : D3.Selection.Selection<obj,obj,Browser.Types.HTMLElement,obj 
 
 /// Please note that in order to have `d3.select(unsafeJsThis)` work
 /// it's important to `inline` the function
-let inline animateSecondStep () =
-    d3.select(unsafeJsThis)
+let animateSecondStep (self : obj) =
+    d3.select(self)
       .transition()
         .duration(1000.)
         .attr("r", 40)
@@ -69,13 +72,13 @@ let inline animateSecondStep () =
 
 /// Please note that in order to have `d3.select(unsafeJsThis)` work
 /// it's important to `inline` the function
-let inline animateFirstStep () =
-    d3.select(unsafeJsThis)
+let animateFirstStep (self : obj) =
+    d3.select(self)
         .transition()
         .delay(0.)
         .duration(1000.)
         .attr("r", 10)
-        .on("end", animateSecondStep)
+        .on("end", fun _ -> animateSecondStep self )
     |> ignore
 
 animationSVG.append("circle")
@@ -84,5 +87,5 @@ animationSVG.append("circle")
         .attr("r", 40)
         .attr("cx", 50)
         .attr("cy", 50)
-        .on("mousedown", animateFirstStep)
+        .on("mousedown", thisFunc animateFirstStep)
         |> ignore
